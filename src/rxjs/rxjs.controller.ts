@@ -10,4 +10,19 @@ export class RxjsController {
   async repositories(@Query() { text, hub }: IParamText) {
     return await this.rxjsService.searchRepositories(text, hub);
   }
+
+  // Всё, что ниже - альтернатива для доступных хабов
+  @Get("repositoriesSearchInHub/")
+  async repositoriesSearchInHub(@Query() { text, hub }: IParamText) {
+    console.log('repositories search', text)
+    return await this.rxjsService.search(text, hub || "github");
+  }
+
+  @Get("projectsSearchInHub/")
+  async projectsSearchInHub(@Query() { text, hub }: IParamText) {
+    console.log('projects search', text)
+    return await this.rxjsService.search(text, hub || "gitlab");
+  }
+
+
 }
