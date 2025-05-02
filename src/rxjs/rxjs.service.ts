@@ -43,15 +43,10 @@ export class RxjsService {
     // Здесь можно добавить логику проверки на какой hub делать запрос
     console.log("request hub = ", hub);
     let data$;
-    switch (hub) {
-      case 'github' :
-        data$ = this.getGithub(text, 10).pipe(toArray());
-        break;
-      case 'gitlab' :
-        (data$ = this.getGitlab(text, 10).pipe(toArray()));
-        break;
-      default :
-        data$ = this.getGithub(text, 10).pipe(toArray());
+    if (hub === "gitlab") {
+      data$ = this.getGitlab(text, 10).pipe(toArray());
+    } else {
+      data$ = this.getGithub(text, 10).pipe(toArray());
     }
     if (!hub) console.log("auto hub = github");
     return await firstValueFrom(data$);
@@ -71,14 +66,16 @@ export class RxjsService {
   // Поиск среди доступных хабов
   async search(text: string, hub: string): Promise<any> {
     console.log("hub = ", hub);
-    if (this.hubs.hasOwnProperty(hub)) {
-      console.log(`${hub} существует в hubs`);
-      const data$ = this.get(this.hubs[hub], text, 10).pipe(toArray());
-      data$.subscribe(() => { });
-      return await firstValueFrom(data$);
-    } else {
-      console.log(`${hub} не существует в hubs`);
-      throw new HttpException(`Хаб "${hub}" не существует`, HttpStatus.NOT_FOUND);
+    if (!this.hasOwnProperty(hub)) {
+      throw new HttpException(
+          `Хаб "${hub}" не существует`,
+          HttpStatus.NOT_FOUND
+      );
     }
+
+    const data$ = this.get(this.hubs[hub], text, 10).pipe(toArray());
+    data$.subscribe();
+
+    return await firstValueFrom(data$);
   }
 }
